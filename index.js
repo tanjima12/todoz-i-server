@@ -47,6 +47,24 @@ async function run() {
       const result = await List.deleteOne(query);
       res.send(result);
     });
+    app.patch("/updateTodo/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+
+      const listInf = req.body;
+      console.log("Received data:", req.body);
+      const Info = {
+        $set: {
+          Title: listInf.Title,
+          Description: listInf.Description,
+          Deadline: listInf.Deadline,
+          Priority: listInf.Priority,
+        },
+      };
+      const result = await List.updateOne(filter, Info);
+      console.log("update result", result);
+      res.send(result);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
