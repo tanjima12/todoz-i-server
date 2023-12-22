@@ -10,7 +10,7 @@ const port = process.env.PORT || 5007;
 app.use(express.json());
 app.use(cors());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri =
   "mongodb+srv://todoz:jcHytVIX4yMtjQkQ@cluster0.2xzkprd.mongodb.net/?retryWrites=true&w=majority";
 
@@ -29,12 +29,22 @@ async function run() {
     await client.connect();
 
     const List = client.db("todoz").collection("list");
+    app.get("/addList", async (req, res) => {
+      const result = await List.find().toArray();
+      res.send(result);
+    });
 
     app.post("/addList", async (req, res) => {
       const ListItem = req.body;
       console.log(ListItem);
       ListItem.Deadline = new Date(ListItem.Deadline);
       const result = await List.insertOne(ListItem);
+      res.send(result);
+    });
+    app.delete("/addListDlt/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await List.deleteOne(query);
       res.send(result);
     });
     // Send a ping to confirm a successful connection
