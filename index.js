@@ -28,8 +28,18 @@ async function run() {
     await client.connect();
 
     const List = client.db("todoz").collection("list");
+    // app.get("/addList", async (req, res) => {
+    //   const result = await List.find().toArray();
+    //   res.send(result);
+    // });
+
     app.get("/addList", async (req, res) => {
-      const result = await List.find().toArray();
+      let query = {};
+
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await List.find(query).toArray();
       res.send(result);
     });
 
@@ -62,6 +72,16 @@ async function run() {
       };
       const result = await List.updateOne(filter, Info);
       console.log("update result", result);
+      res.send(result);
+    });
+
+    app.patch("/addList/update:id", async (req, res) => {
+      const taskId = req.params.id;
+      const { status } = req.body;
+      const result = await List.updateOne(
+        { _id: new ObjectId(taskId) },
+        { $set: { status } }
+      );
       res.send(result);
     });
     // Send a ping to confirm a successful connection
